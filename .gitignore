@@ -6,3 +6,5 @@ vendor/
 .DS_Store
 .claude/
 .playwright-mcp/
+README_LOCAL.md
+project_log.md
