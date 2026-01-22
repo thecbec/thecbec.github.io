@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CBEC Post Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Softer dark theme */
+      --shell: #2d2b29;
+      --shell-elevated: #3a3836;
+      --shell-border: #504d4a;
+      --paper: #fdfbf7;
+      --paper-warm: #f8f5ef;
+      --ink: #1c1917;
+      --ink-muted: #9a958f;
+      --ink-faint: #b8b3ac;
+      --accent: #b45309;
+      --accent-soft: #fef3c7;
+      --accent-glow: rgba(180, 83, 9, 0.2);
+      --success: #22c55e;
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'Newsreader', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--shell);
+      color: var(--paper);
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      overflow: hidden;
+    }
+
+    /* Grain texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      background: var(--shell-elevated);
+      border-right: 1px solid var(--shell-border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--shell-border);
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--paper);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--accent) 0%, #d97706 100%);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: white;
+    }
+
+    .sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar { width: 6px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: var(--shell-border); border-radius: 3px; }
+
+    .field-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .field-group-title {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-faint);
+      margin-bottom: 0.75rem;
+      padding-left: 2px;
+    }
+
+    .field {
+      margin-bottom: 0.875rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--ink-faint);
+      margin-bottom: 0.4rem;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--paper);
+      background: var(--shell);
+      border: 1px solid var(--shell-border);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: var(--ink-muted);
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .field-hint {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      margin-top: 0.35rem;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.4rem;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--ink-faint);
+      cursor: pointer;
+      padding: 0.35rem 0.5rem;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+
+    .checkbox-item:hover {
+      background: var(--shell);
+    }
+
+    .checkbox-item input {
+      accent-color: var(--accent);
+      width: 14px;
+      height: 14px;
+    }
+
+    .checkbox-item input:checked + span {
+      color: var(--paper);
+    }
+
+    .image-drop {
+      border: 2px dashed var(--shell-border);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .image-drop:hover,
+    .image-drop.dragover {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .image-drop-text {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+
+    .image-drop input { display: none; }
+
+    .path-inputs {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+    }
+
+    .path-inputs select {
+      flex: 0 0 110px;
+      font-size: 0.75rem;
+      padding: 0.45rem 0.5rem;
+    }
+
+    .path-inputs input {
+      flex: 1;
+      font-size: 0.75rem;
+      padding: 0.45rem 0.5rem;
+    }
+
+    .sidebar-footer {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid var(--shell-border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.55rem 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s var(--ease-out);
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      flex: 1;
+    }
+
+    .btn-primary:hover {
+      background: #a04308;
+      box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--shell);
+      color: var(--paper);
+      border: 1px solid var(--shell-border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--shell-border);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink-faint);
+    }
+
+    .btn-ghost:hover {
+      color: var(--paper);
+      background: var(--shell);
+    }
+
+    /* ===== MAIN EDITOR AREA ===== */
+    .main {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .editor-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: var(--shell-elevated);
+      border-bottom: 1px solid var(--shell-border);
+    }
+
+    .editor-tabs {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .tab {
+      padding: 0.5rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tab:hover { color: var(--paper); }
+    .tab.active {
+      color: var(--paper);
+      background: var(--shell);
+    }
+
+    .editor-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .file-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.75rem;
+      background: var(--shell);
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--ink-faint);
+    }
+
+    .file-badge-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+    }
+
+    .status-text {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+    }
+
+    /* Editor canvas */
+    .editor-canvas {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      overflow-y: auto;
+      background: linear-gradient(180deg, #3d3a38 0%, #2d2b29 100%);
+      padding: 2rem;
+    }
+
+    .editor-canvas::-webkit-scrollbar { width: 8px; }
+    .editor-canvas::-webkit-scrollbar-track { background: transparent; }
+    .editor-canvas::-webkit-scrollbar-thumb { background: var(--shell-border); border-radius: 4px; }
+
+    .editor-paper {
+      width: 100%;
+      max-width: 720px;
+      min-height: calc(100vh - 200px);
+      background: var(--paper);
+      border-radius: 4px 4px 0 0;
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.05),
+        0 25px 50px -12px rgba(0,0,0,0.5),
+        0 0 100px rgba(180, 83, 9, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Paper texture */
+    .editor-paper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.015;
+      pointer-events: none;
+    }
+
+    .editor {
+      min-height: 500px;
+      padding: 3rem 3.5rem;
+      font-family: var(--font-body);
+      font-size: 1.125rem;
+      line-height: 1.8;
+      color: var(--ink);
+      outline: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .editor:empty::before {
+      content: 'Start writing your story...';
+      color: var(--ink-faint);
+      font-style: italic;
+      pointer-events: none;
+    }
+
+    .editor p {
+      margin-bottom: 1.25rem;
+    }
+
+    .editor h2 {
+      font-family: var(--font-display);
+      font-size: 1.875rem;
+      font-weight: 500;
+      line-height: 1.3;
+      margin: 2rem 0 1rem;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .editor h3 {
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      font-weight: 500;
+      line-height: 1.4;
+      margin: 1.75rem 0 0.75rem;
+      color: var(--ink);
+    }
+
+    .editor blockquote {
+      margin: 1.5rem 0;
+      padding: 1.25rem 1.5rem;
+      background: var(--paper-warm);
+      border-left: 3px solid var(--accent);
+      font-style: italic;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .editor ul, .editor ol {
+      margin: 1rem 0 1rem 1.5rem;
+    }
+
+    .editor li {
+      margin-bottom: 0.4rem;
+    }
+
+    .editor a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .editor hr {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--ink-faint), transparent);
+      margin: 2rem 0;
+    }
+
+    .editor figure {
+      margin: 1.5rem 0;
+    }
+
+    .editor img {
+      max-width: 100%;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .editor strong {
+      font-weight: 600;
+    }
+
+    /* Drop overlay */
+    .drop-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(180, 83, 9, 0.1);
+      border: 3px dashed var(--accent);
+      border-radius: 4px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .drop-overlay.active {
+      display: flex;
+    }
+
+    .drop-overlay span {
+      background: var(--paper);
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-weight: 500;
+      color: var(--accent);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    /* ===== FLOATING TOOLBAR ===== */
+    .floating-toolbar {
+      position: fixed;
+      display: none;
+      align-items: center;
+      gap: 2px;
+      padding: 4px;
+      background: var(--shell);
+      border: 1px solid var(--shell-border);
+      border-radius: 10px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      z-index: 500;
+      transform: translateY(8px);
+      opacity: 0;
+      transition: transform 0.2s var(--ease-spring), opacity 0.15s;
+    }
+
+    .floating-toolbar.visible {
+      display: flex;
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .floating-toolbar button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: var(--paper);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .floating-toolbar button:hover {
+      background: var(--shell-border);
+    }
+
+    .floating-toolbar button[data-action="bold"] { font-weight: 800; }
+    .floating-toolbar button[data-action="italic"] { font-style: italic; }
+
+    .floating-toolbar .divider {
+      width: 1px;
+      height: 20px;
+      background: var(--shell-border);
+      margin: 0 4px;
+    }
+
+    /* ===== SLASH COMMAND PALETTE ===== */
+    .slash-menu {
+      position: fixed;
+      display: none;
+      min-width: 220px;
+      max-height: 320px;
+      overflow-y: auto;
+      background: var(--shell);
+      border: 1px solid var(--shell-border);
+      border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      padding: 6px;
+      z-index: 1000;
+      transform: translateY(8px);
+      opacity: 0;
+      transition: transform 0.2s var(--ease-spring), opacity 0.15s;
+    }
+
+    .slash-menu.visible {
+      display: block;
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .slash-menu-header {
+      padding: 0.5rem 0.75rem 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-muted);
+    }
+
+    .slash-menu button {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--paper);
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .slash-menu button:hover,
+    .slash-menu button.selected {
+      background: var(--shell-border);
+    }
+
+    .slash-menu .cmd-icon {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--shell-elevated);
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .slash-menu .cmd-text {
+      flex: 1;
+    }
+
+    .slash-menu .cmd-hint {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+    }
+
+    /* ===== IMAGE PATH MODAL ===== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 600;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .modal-backdrop.visible {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-box {
+      background: var(--shell-elevated);
+      border: 1px solid var(--shell-border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      width: 90%;
+      max-width: 420px;
+      transform: scale(0.95);
+      transition: transform 0.2s var(--ease-spring);
+    }
+
+    .modal-backdrop.visible .modal-box {
+      transform: scale(1);
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--paper);
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-field {
+      margin-bottom: 1rem;
+    }
+
+    .modal-field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--ink-faint);
+      margin-bottom: 0.4rem;
+    }
+
+    .modal-field input,
+    .modal-field select {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--paper);
+      background: var(--shell);
+      border: 1px solid var(--shell-border);
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .modal-field input:focus,
+    .modal-field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .modal-actions .btn {
+      flex: 1;
+    }
+
+    .image-browse-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .modal-preview {
+      margin: 1rem 0;
+      padding: 0.75rem;
+      background: var(--shell);
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .modal-preview img {
+      max-width: 100%;
+      max-height: 150px;
+      border-radius: 6px;
+      object-fit: contain;
+    }
+
+    .modal-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.25rem 0;
+      color: var(--ink-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .modal-divider::before,
+    .modal-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--shell-border);
+    }
+
+    /* ===== PREVIEW MODAL ===== */
+    .preview-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem;
+      overflow-y: auto;
+      z-index: 700;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .preview-backdrop.visible {
+      display: flex;
+      opacity: 1;
+    }
+
+    .preview-box {
+      background: var(--paper);
+      border-radius: 8px;
+      width: 100%;
+      max-width: 760px;
+      position: relative;
+      transform: translateY(20px);
+      transition: transform 0.3s var(--ease-out);
+    }
+
+    .preview-backdrop.visible .preview-box {
+      transform: translateY(0);
+    }
+
+    .preview-close {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      width: 36px;
+      height: 36px;
+      background: var(--shell);
+      border: 1px solid var(--shell-border);
+      border-radius: 50%;
+      color: var(--paper);
+      font-size: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s;
+      z-index: 10;
+    }
+
+    .preview-close:hover {
+      transform: scale(1.1);
+    }
+
+    .preview-header {
+      padding: 2.5rem 3rem 1.5rem;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .preview-header h1 {
+      font-family: var(--font-display);
+      font-size: 2.25rem;
+      font-weight: 500;
+      line-height: 1.25;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .preview-meta {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+    }
+
+    .preview-content {
+      padding: 2rem 3rem 3rem;
+      font-family: var(--font-body);
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--ink);
+    }
+
+    .preview-content h2 {
+      font-family: var(--font-display);
+      font-size: 1.625rem;
+      font-weight: 500;
+      margin: 1.75rem 0 0.875rem;
+    }
+
+    .preview-content h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin: 1.5rem 0 0.75rem;
+    }
+
+    .preview-content p { margin-bottom: 1.125rem; }
+    .preview-content img { max-width: 100%; border-radius: 6px; }
+    .preview-content blockquote {
+      margin: 1.5rem 0;
+      padding: 1rem 1.25rem;
+      background: var(--paper-warm);
+      border-left: 3px solid var(--accent);
+      font-style: italic;
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--shell);
+      border: 1px solid var(--shell-border);
+      color: var(--paper);
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      opacity: 0;
+      transition: transform 0.35s var(--ease-spring), opacity 0.25s;
+      z-index: 900;
+    }
+
+    .toast.visible {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      background: var(--success);
+      border-color: var(--success);
+    }
+
+    /* ===== KEYBOARD HINTS ===== */
+    kbd {
+      display: inline-block;
+      padding: 2px 6px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      background: var(--shell);
+      border: 1px solid var(--shell-border);
+      border-radius: 4px;
+      color: var(--ink-faint);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      body {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+
+      .sidebar {
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--shell-border);
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .sidebar-scroll {
+        display: none;
+        padding: 1rem;
+      }
+
+      .sidebar.expanded .sidebar-scroll {
+        display: block;
+      }
+
+      .sidebar-toggle {
+        background: var(--shell);
+        border: 1px solid var(--shell-border);
+        color: var(--paper);
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        cursor: pointer;
+      }
+
+      .sidebar-footer {
+        display: none;
+      }
+
+      .sidebar.expanded .sidebar-footer {
+        display: flex;
+      }
+
+      .editor-canvas {
+        padding: 1rem;
+      }
+
+      .editor {
+        padding: 2rem 1.5rem;
+        font-size: 1rem;
+      }
+
+      .preview-header,
+      .preview-content {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-mark">CB</div>
+        <span>Post Builder</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebar-toggle">Details</button>
+    </div>
+
+    <div class="sidebar-scroll">
+      <div class="field-group">
+        <div class="field-group-title">Post Info</div>
+
+        <div class="field">
+          <label for="title">Title</label>
+          <input type="text" id="title" placeholder="Your post title">
+        </div>
+
+        <div class="field">
+          <label for="slug">Slug</label>
+          <input type="text" id="slug" placeholder="auto-from-title">
+          <div class="field-hint" id="filename-hint">2026-01-15-post.md</div>
+        </div>
+
+        <div class="field">
+          <label for="date">Publish Date</label>
+          <input type="datetime-local" id="date">
+        </div>
+
+        <div class="field">
+          <label for="author">Author</label>
+          <input type="text" id="author" placeholder="Optional">
+        </div>
+
+        <div class="field">
+          <label for="excerpt">Excerpt</label>
+          <textarea id="excerpt" placeholder="Brief summary..."></textarea>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Taxonomy</div>
+
+        <div class="field">
+          <label>Categories</label>
+          <div class="checkbox-grid" id="categories">
+            <label class="checkbox-item"><input type="checkbox" value="Stories"><span>Stories</span></label>
+            <label class="checkbox-item"><input type="checkbox" value="Insights"><span>Insights</span></label>
+            <label class="checkbox-item"><input type="checkbox" value="CBEC Forums"><span>Forums</span></label>
+            <label class="checkbox-item"><input type="checkbox" value="Journal"><span>Journal</span></label>
+            <label class="checkbox-item"><input type="checkbox" value="Events"><span>Events</span></label>
+            <label class="checkbox-item"><input type="checkbox" value="Publications"><span>Pubs</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="tags">Tags</label>
+          <input type="text" id="tags" placeholder="tag1, tag2, tag3">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Featured Image</div>
+
+        <div class="field">
+          <div class="image-drop" id="featured-drop">
+            <div class="image-drop-text">Drop image or click to select</div>
+            <input type="file" id="featured-file" accept="image/*">
+          </div>
+          <div class="path-inputs">
+            <select id="featured-folder">
+              <option value="auto">Auto</option>
+              <option value="/wp-content/uploads/2025/09/">2025/09</option>
+              <option value="/wp-content/uploads/2025/04/">2025/04</option>
+              <option value="/wp-content/uploads/2024/06/">2024/06</option>
+              <option value="/wp-content/uploads/2024/05/">2024/05</option>
+              <option value="/wp-content/uploads/2024/04/">2024/04</option>
+              <option value="/wp-content/uploads/2023/07/">2023/07</option>
+              <option value="/wp-content/uploads/gallery/">gallery</option>
+            </select>
+            <input type="text" id="featured-filename" placeholder="filename.jpg">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="btn btn-secondary" id="btn-copy">Copy</button>
+      <button class="btn btn-secondary" id="btn-download">Download</button>
+      <button class="btn btn-primary" id="btn-save">Save</button>
+    </div>
+  </aside>
+
+  <!-- Main Editor -->
+  <main class="main">
+    <header class="editor-header">
+      <div class="editor-tabs">
+        <button class="tab active" data-tab="write">Write</button>
+        <button class="tab" data-tab="preview" id="tab-preview">Preview</button>
+      </div>
+      <div class="editor-meta">
+        <div class="file-badge">
+          <span class="file-badge-dot"></span>
+          <span id="footer-filename">2026-01-15-post.md</span>
+        </div>
+        <button class="btn btn-ghost" id="btn-posts">Select _posts</button>
+      </div>
+    </header>
+
+    <div class="editor-canvas">
+      <div class="editor-paper">
+        <div class="editor" id="editor" contenteditable="true"></div>
+        <div class="drop-overlay" id="drop-overlay"><span>Drop image here</span></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Floating Selection Toolbar -->
+  <div class="floating-toolbar" id="floating-toolbar">
+    <button type="button" data-action="undo" title="Undo (Ctrl+Z)">↶</button>
+    <button type="button" data-action="redo" title="Redo (Ctrl+Y)">↷</button>
+    <div class="divider"></div>
+    <button type="button" data-action="bold" title="Bold (Ctrl+B)">B</button>
+    <button type="button" data-action="italic" title="Italic (Ctrl+I)">I</button>
+    <div class="divider"></div>
+    <button type="button" data-action="paragraph" title="Paragraph">P</button>
+    <button type="button" data-action="h2" title="Heading 2">H2</button>
+    <button type="button" data-action="h3" title="Heading 3">H3</button>
+    <div class="divider"></div>
+    <button type="button" data-action="link" title="Link (Ctrl+K)">Link</button>
+    <button type="button" data-action="quote" title="Blockquote">"</button>
+  </div>
+
+  <!-- Slash Command Menu -->
+  <div class="slash-menu" id="slash-menu">
+    <div class="slash-menu-header">Insert Block</div>
+    <button type="button" data-cmd="h2">
+      <span class="cmd-icon">H2</span>
+      <span class="cmd-text">Heading</span>
+      <span class="cmd-hint">/h2</span>
+    </button>
+    <button type="button" data-cmd="h3">
+      <span class="cmd-icon">H3</span>
+      <span class="cmd-text">Subheading</span>
+      <span class="cmd-hint">/h3</span>
+    </button>
+    <button type="button" data-cmd="paragraph">
+      <span class="cmd-icon">P</span>
+      <span class="cmd-text">Paragraph</span>
+      <span class="cmd-hint">/p</span>
+    </button>
+    <button type="button" data-cmd="ul">
+      <span class="cmd-icon">•</span>
+      <span class="cmd-text">Bullet List</span>
+      <span class="cmd-hint">/ul</span>
+    </button>
+    <button type="button" data-cmd="ol">
+      <span class="cmd-icon">1.</span>
+      <span class="cmd-text">Numbered List</span>
+      <span class="cmd-hint">/ol</span>
+    </button>
+    <button type="button" data-cmd="quote">
+      <span class="cmd-icon">"</span>
+      <span class="cmd-text">Quote</span>
+      <span class="cmd-hint">/quote</span>
+    </button>
+    <button type="button" data-cmd="hr">
+      <span class="cmd-icon">—</span>
+      <span class="cmd-text">Divider</span>
+      <span class="cmd-hint">/hr</span>
+    </button>
+    <button type="button" data-cmd="image">
+      <span class="cmd-icon">+</span>
+      <span class="cmd-text">Image</span>
+      <span class="cmd-hint">/img</span>
+    </button>
+  </div>
+
+  <!-- Image Path Modal -->
+  <div class="modal-backdrop" id="path-modal">
+    <div class="modal-box">
+      <div class="modal-title">Insert Image</div>
+
+      <!-- File browser section -->
+      <div class="modal-field">
+        <label>Browse for image file</label>
+        <div class="image-browse-row">
+          <button class="btn btn-secondary" id="modal-browse" type="button">Browse Files...</button>
+          <input type="file" id="modal-file-input" accept="image/*" style="display:none">
+        </div>
+      </div>
+
+      <!-- Image preview -->
+      <div class="modal-preview" id="modal-preview" style="display:none">
+        <img id="modal-preview-img" src="" alt="Preview">
+      </div>
+
+      <div class="modal-divider">
+        <span>Image path settings</span>
+      </div>
+
+      <div class="modal-field">
+        <label>Folder</label>
+        <select id="modal-folder">
+          <option value="auto">Auto (based on post date)</option>
+          <option value="/wp-content/uploads/2025/09/">2025/09</option>
+          <option value="/wp-content/uploads/2025/04/">2025/04</option>
+          <option value="/wp-content/uploads/2024/06/">2024/06</option>
+          <option value="/wp-content/uploads/2024/05/">2024/05</option>
+          <option value="/wp-content/uploads/2024/04/">2024/04</option>
+          <option value="/wp-content/uploads/2023/07/">2023/07</option>
+          <option value="/wp-content/uploads/gallery/">gallery</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Filename</label>
+        <input type="text" id="modal-filename" placeholder="image.jpg">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+        <button class="btn btn-primary" id="modal-confirm">Insert</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Modal -->
+  <div class="preview-backdrop" id="preview-overlay">
+    <div class="preview-box">
+      <button class="preview-close" id="preview-close">&times;</button>
+      <div class="preview-header">
+        <h1 id="preview-title">Post Title</h1>
+        <div class="preview-meta" id="preview-meta">January 15, 2026</div>
+      </div>
+      <div class="preview-content" id="preview-content"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const state = { postsDir: null, slashActive: false, slashRange: null, slashIndex: 0, modalImageFile: null };
+    const $ = id => document.getElementById(id);
+    const editor = $('editor');
+    const slashMenu = $('slash-menu');
+    const floatingToolbar = $('floating-toolbar');
+    const pathModal = $('path-modal');
+
+    // Utilities
+    function slugify(text) { return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80); }
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function getDateParts() {
+      const val = $('date').value;
+      const d = val ? new Date(val) : new Date();
+      return { year: d.getFullYear(), month: pad(d.getMonth() + 1), day: pad(d.getDate()), hour: pad(d.getHours()), min: pad(d.getMinutes()) };
+    }
+
+    function updateFilename() {
+      const slug = $('slug').value.trim() || slugify($('title').value) || 'new-post';
+      const p = getDateParts();
+      const name = `${p.year}-${p.month}-${p.day}-${slug}.md`;
+      $('filename-hint').textContent = name;
+      $('footer-filename').textContent = name;
+    }
+
+    function showToast(msg, type = '') {
+      const toast = $('toast');
+      toast.textContent = msg;
+      toast.className = 'toast visible' + (type ? ' ' + type : '');
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => toast.classList.remove('visible'), 3000);
+    }
+
+    function yamlQuote(v) { return `"${v.replace(/"/g, '\\"')}"`; }
+
+    function formatDateForDisplay(dateStr) {
+      const d = dateStr ? new Date(dateStr) : new Date();
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+    }
+
+    // Get folder path - handle "auto" option
+    function getAutoFolder() {
+      const p = getDateParts();
+      return `/wp-content/uploads/${p.year}/${p.month}/`;
+    }
+
+    function resolveFolder(folderValue) {
+      return folderValue === 'auto' ? getAutoFolder() : folderValue;
+    }
+
+    function getFeaturedPath() {
+      const folder = resolveFolder($('featured-folder').value);
+      const filename = $('featured-filename').value.trim();
+      return filename ? folder + filename : '';
+    }
+
+    // Front matter generation
+    function generateFrontMatter() {
+      const p = getDateParts();
+      const offset = new Date().getTimezoneOffset();
+      const sign = offset <= 0 ? '+' : '-';
+      const absOff = Math.abs(offset);
+      const tz = sign + pad(Math.floor(absOff / 60)) + pad(absOff % 60);
+      const lines = ['---', 'layout: "post"'];
+      lines.push(`title: ${yamlQuote($('title').value.trim() || 'Untitled')}`);
+      lines.push(`date: "${p.year}-${p.month}-${p.day} ${p.hour}:${p.min}:00 ${tz}"`);
+      if ($('author').value.trim()) lines.push(`author: ${yamlQuote($('author').value.trim())}`);
+      const featured = getFeaturedPath();
+      if (featured) lines.push(`featured_image: ${yamlQuote(featured)}`);
+      const excerpt = $('excerpt').value.trim();
+      if (excerpt) lines.push(`excerpt: ${yamlQuote(excerpt)}`);
+      const cats = [...document.querySelectorAll('#categories input:checked')].map(c => c.value);
+      if (cats.length) { lines.push('categories:'); cats.forEach(c => lines.push(`  - ${yamlQuote(c)}`)); }
+      const tags = $('tags').value.split(',').map(t => t.trim()).filter(Boolean);
+      if (tags.length) { lines.push('tags:'); tags.forEach(t => lines.push(`  - ${yamlQuote(t)}`)); }
+      lines.push('---', '');
+      return lines.join('\n');
+    }
+
+    // Clean HTML output
+    function cleanHtml(html) {
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+
+      // Convert blob URLs to server paths
+      temp.querySelectorAll('figure[data-server-path]').forEach(figure => {
+        const serverPath = figure.dataset.serverPath;
+        const img = figure.querySelector('img');
+        if (img && serverPath) {
+          img.src = serverPath;  // Replace blob URL with server path
+        }
+      });
+
+      // Remove upload indicator divs
+      temp.querySelectorAll('.image-upload-indicator').forEach(el => el.remove());
+
+      temp.querySelectorAll('[style]').forEach(el => el.removeAttribute('style'));
+      temp.querySelectorAll('*').forEach(el => {
+        [...el.attributes].forEach(attr => {
+          if (attr.name.startsWith('data-')) el.removeAttribute(attr.name);
+        });
+      });
+
+      temp.querySelectorAll('div').forEach(div => {
+        if (div.querySelector('h2, h3, p, ul, ol, blockquote, figure')) return;
+        const p = document.createElement('p');
+        p.innerHTML = div.innerHTML;
+        div.replaceWith(p);
+      });
+
+      temp.querySelectorAll('span').forEach(span => {
+        if (!span.className) span.replaceWith(...span.childNodes);
+      });
+
+      temp.querySelectorAll('h2').forEach(h => { if (!h.className) h.className = 'wp-block-heading'; });
+      temp.querySelectorAll('h3').forEach(h => { if (!h.className) h.className = 'wp-block-heading'; });
+      temp.querySelectorAll('blockquote').forEach(bq => { if (!bq.className) bq.className = 'wp-block-quote'; });
+
+      temp.querySelectorAll('img').forEach(img => {
+        if (img.parentElement.tagName !== 'FIGURE') {
+          const figure = document.createElement('figure');
+          figure.className = 'wp-block-image size-large';
+          img.parentElement.insertBefore(figure, img);
+          figure.appendChild(img);
+        }
+      });
+
+      temp.querySelectorAll('p').forEach(p => {
+        if (!p.textContent.trim() && !p.querySelector('img')) p.remove();
+      });
+
+      let output = '';
+      temp.childNodes.forEach(node => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          let html = node.outerHTML;
+          html = html.replace(/&nbsp;/g, ' ').replace(/  +/g, ' ');
+          output += html + '\n\n';
+        }
+      });
+
+      return output.trim();
+    }
+
+    function generatePost() {
+      return generateFrontMatter() + cleanHtml(editor.innerHTML) + '\n';
+    }
+
+    // Formatting
+    function execFormat(cmd, value = null) {
+      document.execCommand(cmd, false, value);
+      editor.focus();
+    }
+
+    function applyFormat(action) {
+      editor.focus();
+      switch (action) {
+        case 'undo': document.execCommand('undo'); break;
+        case 'redo': document.execCommand('redo'); break;
+        case 'bold': execFormat('bold'); break;
+        case 'italic': execFormat('italic'); break;
+        case 'h2': document.execCommand('formatBlock', false, 'h2'); break;
+        case 'h3': document.execCommand('formatBlock', false, 'h3'); break;
+        case 'paragraph': document.execCommand('formatBlock', false, 'p'); break;
+        case 'ul': execFormat('insertUnorderedList'); break;
+        case 'ol': execFormat('insertOrderedList'); break;
+        case 'quote': document.execCommand('formatBlock', false, 'blockquote'); break;
+        case 'link':
+          const url = prompt('Enter URL:');
+          if (url) execFormat('createLink', url);
+          break;
+        case 'hr': execFormat('insertHorizontalRule'); break;
+        case 'image': showImageModal(); break;
+      }
+    }
+
+    // Image modal
+    function showImageModal(filename = '') {
+      $('modal-filename').value = filename;
+      state.modalImageFile = null;
+      $('modal-preview').style.display = 'none';
+      $('modal-preview-img').src = '';
+      pathModal.classList.add('visible');
+      $('modal-filename').focus();
+    }
+
+    function hideImageModal() {
+      pathModal.classList.remove('visible');
+      state.modalImageFile = null;
+    }
+
+    // File browser button
+    $('modal-browse').addEventListener('click', () => {
+      $('modal-file-input').click();
+    });
+
+    // File input change handler
+    $('modal-file-input').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        state.modalImageFile = file;
+        const blobUrl = URL.createObjectURL(file);
+        $('modal-preview-img').src = blobUrl;
+        $('modal-preview').style.display = 'block';
+        // Auto-fill filename
+        const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-').toLowerCase();
+        $('modal-filename').value = cleanName;
+        showToast('Image selected');
+      }
+      // Reset input so same file can be selected again
+      e.target.value = '';
+    });
+
+    $('modal-cancel').addEventListener('click', hideImageModal);
+    $('modal-confirm').addEventListener('click', () => {
+      const folder = resolveFolder($('modal-folder').value);
+      const filename = $('modal-filename').value.trim();
+      if (filename) {
+        const path = folder + filename;
+        if (state.modalImageFile) {
+          // Insert with live preview (blob URL)
+          insertImageWithPreview(state.modalImageFile, path);
+        } else {
+          // Insert path only (no preview)
+          insertImageAtCursor(path);
+        }
+        showToast(`Image added`);
+      }
+      hideImageModal();
+    });
+
+    pathModal.addEventListener('click', e => {
+      if (e.target === pathModal) hideImageModal();
+    });
+
+    function insertImageAtCursor(path) {
+      editor.focus();
+      const figure = document.createElement('figure');
+      figure.className = 'wp-block-image size-large';
+      const img = document.createElement('img');
+      img.src = path;
+      img.alt = '';
+      figure.appendChild(img);
+
+      const sel = window.getSelection();
+      if (sel.rangeCount) {
+        const range = sel.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(figure);
+        range.setStartAfter(figure);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } else {
+        editor.appendChild(figure);
+      }
+
+      const p = document.createElement('p');
+      p.innerHTML = '<br>';
+      figure.after(p);
+    }
+
+    // Insert image with live preview (blob URL) but store server path for export
+    function insertImageWithPreview(file, serverPath) {
+      editor.focus();
+      const blobUrl = URL.createObjectURL(file);
+
+      const figure = document.createElement('figure');
+      figure.className = 'wp-block-image size-large';
+      figure.dataset.serverPath = serverPath;  // Store server path for export
+
+      const img = document.createElement('img');
+      img.src = blobUrl;  // Show blob preview
+      img.alt = '';
+      figure.appendChild(img);
+
+      // Add a visual indicator that this image needs to be uploaded
+      const indicator = document.createElement('div');
+      indicator.className = 'image-upload-indicator';
+      indicator.textContent = 'Copy to: ' + serverPath;
+      indicator.style.cssText = 'font-size:11px;color:#b45309;background:#fef3c7;padding:4px 8px;border-radius:0 0 6px 6px;text-align:center;';
+      figure.appendChild(indicator);
+
+      const sel = window.getSelection();
+      if (sel.rangeCount) {
+        const range = sel.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(figure);
+        range.setStartAfter(figure);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } else {
+        editor.appendChild(figure);
+      }
+
+      const p = document.createElement('p');
+      p.innerHTML = '<br>';
+      figure.after(p);
+    }
+
+    function handleImageFile(file, forFeatured = false) {
+      const filename = file.name.replace(/[^a-zA-Z0-9._-]/g, '-').toLowerCase();
+      if (forFeatured) {
+        $('featured-filename').value = filename;
+        showToast(`Set filename to "${filename}"`);
+      } else {
+        // Store the file and show modal for path configuration
+        state.modalImageFile = file;
+        $('modal-filename').value = filename;
+        // Show preview in modal
+        const blobUrl = URL.createObjectURL(file);
+        $('modal-preview-img').src = blobUrl;
+        $('modal-preview').style.display = 'block';
+        pathModal.classList.add('visible');
+      }
+    }
+
+    // Floating toolbar
+    let toolbarTimeout;
+
+    function updateFloatingToolbar() {
+      const sel = window.getSelection();
+      if (!sel.rangeCount || sel.isCollapsed || !editor.contains(sel.anchorNode)) {
+        floatingToolbar.classList.remove('visible');
+        return;
+      }
+
+      const range = sel.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+
+      floatingToolbar.style.top = (rect.top - 50) + 'px';
+      floatingToolbar.style.left = (rect.left + rect.width / 2 - floatingToolbar.offsetWidth / 2) + 'px';
+      floatingToolbar.classList.add('visible');
+    }
+
+    document.addEventListener('selectionchange', () => {
+      clearTimeout(toolbarTimeout);
+      toolbarTimeout = setTimeout(updateFloatingToolbar, 150);
+    });
+
+    floatingToolbar.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('mousedown', e => {
+        e.preventDefault();
+        applyFormat(btn.dataset.action);
+      });
+    });
+
+    // Keyboard shortcuts
+    editor.addEventListener('keydown', e => {
+      const ctrl = e.ctrlKey || e.metaKey;
+
+      if (state.slashActive) {
+        const items = [...slashMenu.querySelectorAll('button')].filter(b => b.style.display !== 'none');
+        if (e.key === 'ArrowDown') { e.preventDefault(); state.slashIndex = (state.slashIndex + 1) % items.length; updateSlashSelection(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); state.slashIndex = (state.slashIndex - 1 + items.length) % items.length; updateSlashSelection(); }
+        else if (e.key === 'Enter') { e.preventDefault(); executeSlashCommand(items[state.slashIndex]?.dataset.cmd); }
+        else if (e.key === 'Escape') { hideSlashMenu(); }
+        return;
+      }
+
+      if (ctrl) {
+        if (e.key === 'b') { e.preventDefault(); applyFormat('bold'); }
+        if (e.key === 'i') { e.preventDefault(); applyFormat('italic'); }
+        if (e.key === 'k') { e.preventDefault(); applyFormat('link'); }
+      }
+    });
+
+    // Slash commands
+    editor.addEventListener('input', () => {
+      const sel = window.getSelection();
+      if (!sel.rangeCount) return;
+      const range = sel.getRangeAt(0);
+      const node = range.startContainer;
+
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent;
+        const pos = range.startOffset;
+        if (text[pos - 1] === '/' && (pos === 1 || /\s/.test(text[pos - 2] || ''))) {
+          showSlashMenu(range);
+        } else if (state.slashActive) {
+          const slashPos = text.lastIndexOf('/');
+          if (slashPos >= 0 && slashPos < pos) {
+            filterSlashMenu(text.slice(slashPos + 1, pos).toLowerCase());
+          } else {
+            hideSlashMenu();
+          }
+        }
+      }
+    });
+
+    function showSlashMenu(range) {
+      state.slashActive = true;
+      state.slashRange = range.cloneRange();
+      state.slashIndex = 0;
+
+      const rect = range.getBoundingClientRect();
+      const menuHeight = 320;
+      const spaceBelow = window.innerHeight - rect.bottom;
+
+      if (spaceBelow < menuHeight) {
+        slashMenu.style.top = (rect.top - menuHeight - 5) + 'px';
+      } else {
+        slashMenu.style.top = (rect.bottom + 8) + 'px';
+      }
+      slashMenu.style.left = Math.max(10, rect.left) + 'px';
+      slashMenu.classList.add('visible');
+
+      filterSlashMenu('');
+      updateSlashSelection();
+    }
+
+    function hideSlashMenu() {
+      state.slashActive = false;
+      state.slashRange = null;
+      slashMenu.classList.remove('visible');
+    }
+
+    function filterSlashMenu(query) {
+      const items = slashMenu.querySelectorAll('button');
+      let visibleCount = 0;
+      items.forEach(btn => {
+        const text = btn.textContent.toLowerCase();
+        const match = !query || text.includes(query) || btn.dataset.cmd.includes(query);
+        btn.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+      if (visibleCount === 0) hideSlashMenu();
+      else { state.slashIndex = 0; updateSlashSelection(); }
+    }
+
+    function updateSlashSelection() {
+      const items = [...slashMenu.querySelectorAll('button')].filter(b => b.style.display !== 'none');
+      items.forEach((btn, i) => btn.classList.toggle('selected', i === state.slashIndex));
+    }
+
+    function executeSlashCommand(cmd) {
+      if (!cmd) return;
+
+      if (state.slashRange) {
+        const node = state.slashRange.startContainer;
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent;
+          const slashPos = text.lastIndexOf('/');
+          if (slashPos >= 0) {
+            const sel = window.getSelection();
+            const currentPos = sel.rangeCount ? sel.getRangeAt(0).startOffset : text.length;
+            node.textContent = text.slice(0, slashPos) + text.slice(currentPos);
+            const range = document.createRange();
+            range.setStart(node, Math.min(slashPos, node.textContent.length));
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        }
+      }
+
+      hideSlashMenu();
+
+      if (cmd === 'image') {
+        showImageModal();
+      } else {
+        setTimeout(() => applyFormat(cmd), 10);
+      }
+    }
+
+    slashMenu.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => executeSlashCommand(btn.dataset.cmd));
+    });
+
+    document.addEventListener('click', e => {
+      if (state.slashActive && !slashMenu.contains(e.target) && !editor.contains(e.target)) {
+        hideSlashMenu();
+      }
+    });
+
+    editor.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (state.slashActive && !slashMenu.matches(':hover')) {
+          hideSlashMenu();
+        }
+      }, 150);
+    });
+
+    // Paste/drop images
+    editor.addEventListener('paste', e => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          handleImageFile(item.getAsFile(), false);
+          return;
+        }
+      }
+    });
+
+    const editorPaper = document.querySelector('.editor-paper');
+    editorPaper.addEventListener('dragover', e => { e.preventDefault(); $('drop-overlay').classList.add('active'); });
+    editorPaper.addEventListener('dragleave', e => { if (!editorPaper.contains(e.relatedTarget)) $('drop-overlay').classList.remove('active'); });
+    editorPaper.addEventListener('drop', e => {
+      e.preventDefault();
+      $('drop-overlay').classList.remove('active');
+      const file = e.dataTransfer?.files?.[0];
+      if (file?.type.startsWith('image/')) handleImageFile(file, false);
+    });
+
+    // Featured image
+    const featuredDrop = $('featured-drop');
+    const featuredFile = $('featured-file');
+    featuredDrop.addEventListener('click', () => featuredFile.click());
+    featuredDrop.addEventListener('dragover', e => { e.preventDefault(); featuredDrop.classList.add('dragover'); });
+    featuredDrop.addEventListener('dragleave', () => featuredDrop.classList.remove('dragover'));
+    featuredDrop.addEventListener('drop', e => {
+      e.preventDefault();
+      featuredDrop.classList.remove('dragover');
+      const file = e.dataTransfer?.files?.[0];
+      if (file?.type.startsWith('image/')) handleImageFile(file, true);
+    });
+    featuredFile.addEventListener('change', () => {
+      if (featuredFile.files.length) handleImageFile(featuredFile.files[0], true);
+    });
+
+    // Sidebar toggle (mobile)
+    $('sidebar-toggle').addEventListener('click', () => {
+      $('sidebar').classList.toggle('expanded');
+    });
+
+    // Auto-update filename
+    $('title').addEventListener('input', () => {
+      if (!$('slug').value.trim()) $('slug').value = slugify($('title').value);
+      updateFilename();
+    });
+    $('slug').addEventListener('input', updateFilename);
+    $('date').addEventListener('input', updateFilename);
+
+    // Preview
+    $('tab-preview').addEventListener('click', () => {
+      $('preview-title').textContent = $('title').value.trim() || 'Untitled';
+      $('preview-meta').textContent = formatDateForDisplay($('date').value);
+      $('preview-content').innerHTML = cleanHtml(editor.innerHTML);
+      $('preview-overlay').classList.add('visible');
+    });
+    $('preview-close').addEventListener('click', () => $('preview-overlay').classList.remove('visible'));
+    $('preview-overlay').addEventListener('click', e => { if (e.target === $('preview-overlay')) $('preview-overlay').classList.remove('visible'); });
+
+    // Close modals on Escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if ($('preview-overlay').classList.contains('visible')) $('preview-overlay').classList.remove('visible');
+        if (pathModal.classList.contains('visible')) hideImageModal();
+        if (state.slashActive) hideSlashMenu();
+      }
+    });
+
+    // Export actions
+    $('btn-copy').addEventListener('click', async () => {
+      await navigator.clipboard.writeText(generatePost());
+      showToast('Copied to clipboard', 'success');
+    });
+
+    $('btn-download').addEventListener('click', () => {
+      const filename = $('footer-filename').textContent;
+      const blob = new Blob([generatePost()], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showToast('Downloaded ' + filename, 'success');
+    });
+
+    $('btn-posts').addEventListener('click', async () => {
+      if (!window.showDirectoryPicker) { showToast('Browser does not support folder selection'); return; }
+      try { state.postsDir = await window.showDirectoryPicker(); showToast('_posts folder selected', 'success'); } catch {}
+    });
+
+    $('btn-save').addEventListener('click', async () => {
+      if (!state.postsDir) {
+        if (!window.showDirectoryPicker) { showToast('Browser does not support folder selection'); return; }
+        try { state.postsDir = await window.showDirectoryPicker(); } catch { return; }
+      }
+      const filename = $('footer-filename').textContent;
+      try {
+        const handle = await state.postsDir.getFileHandle(filename, { create: true });
+        const writable = await handle.createWritable();
+        await writable.write(generatePost());
+        await writable.close();
+        showToast('Saved to _posts/' + filename, 'success');
+      } catch { showToast('Could not save file'); }
+    });
+
+    // Init
+    function init() {
+      const now = new Date();
+      const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      $('date').value = local;
+      updateFilename();
+      editor.focus();
+    }
+    init();
+  </script>
+</body>
+</html>

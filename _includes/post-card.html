@@ -1,0 +1,26 @@
+{% assign post = include.post %}
+<article class="post-card {{ include.class }}">
+  {% if post.featured_image %}
+  <a class="post-card-media" href="{{ post.url | relative_url }}">
+    <img src="{{ post.featured_image | relative_url }}" alt="{{ post.title | escape }}">
+  </a>
+  {% endif %}
+  <div class="post-card-body">
+    {% if post.categories %}
+    <p class="post-kicker">
+      {% assign cats = post.categories | slice: 0, 2 %}
+      {% for category in cats %}
+        {{ category }}{% unless forloop.last %}, {% endunless %}
+      {% endfor %}
+    </p>
+    {% endif %}
+    <h2 class="post-title"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+    <p class="post-meta">{{ post.date | date: "%B %d, %Y" }}</p>
+    {% if include.show_excerpt %}
+      {% assign excerpt_len = include.excerpt | default: 180 %}
+      {% if post.excerpt %}
+      <p>{{ post.excerpt | strip_html | truncate: excerpt_len }}</p>
+      {% endif %}
+    {% endif %}
+  </div>
+</article>

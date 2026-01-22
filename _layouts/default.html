@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    {% include head.html %}
+  </head>
+  <body class="{{ page.body_class }}">
+    <header class="site-header">
+      <div class="container masthead">
+        <div class="masthead-brand">
+          <p class="site-eyebrow">May we never forget the farm worker spirit and its indelible impact on our lives</p>
+          <div class="site-title-row">
+            <img class="site-logo" src="{{ "/assets/images/cbec-main-logo.png" | relative_url }}" alt="{{ site.title }} logo">
+            <a class="site-title" href="{{ "/" | relative_url }}">{{ site.title }}</a>
+          </div>
+        </div>
+        <div class="masthead-meta">
+          <span>Cross-Border E-Commerce Network</span>
+          <span>{{ site.time | date: "%B %d, %Y" }}</span>
+        </div>
+      </div>
+      <div class="nav-wrap">
+        <div class="container">
+          {% include nav.html %}
+        </div>
+      </div>
+    </header>
+    <main class="content">
+      <div class="container">
+        {{ content }}
+      </div>
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>{{ site.description }}</p>
+        <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
+      </div>
+    </footer>
+  </body>
+</html>

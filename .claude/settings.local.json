@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bundle exec jekyll build:*)",
+      "Bash(set PATH=C:Ruby34-x64bin)",
+      "Bash(C:Ruby34-x64librubygems3.4.0bin)",
+      "Bash(%PATH%)",
+      "Bash(/c/Ruby34-x64/bin/bundle.cmd exec jekyll build:*)",
+      "Bash(cmd.exe /c \"set PATH=C:\\\\Ruby34-x64\\\\bin;C:\\\\Ruby34-x64\\\\lib\\\\ruby\\\\gems\\\\3.4.0\\\\bin;%PATH% && cd /d F:\\\\cbec_fresh && bundle exec jekyll build\")",
+      "Bash(cmd.exe /c \"copy /Y F:\\\\cbec_fresh\\\\assets\\\\css\\\\site.css F:\\\\cbec_fresh\\\\_site\\\\assets\\\\css\\\\site.css\")",
+      "Bash(cmd.exe /c:*)",
+      "Bash(grep:*)",
+      "Bash(dir /b /ad \"F:\\\\cbec_fresh\\\\wp-content\\\\uploads\")",
+      "Bash(claude /plugin marketplace list)",
+      "Bash(claude plugin marketplace list:*)",
+      "Skill(frontend-design)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "Bash(python -m http.server:*)",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_playwright_playwright__browser_click",
+      "mcp__plugin_playwright_playwright__browser_type",
+      "mcp__plugin_playwright_playwright__browser_run_code",
+      "mcp__plugin_playwright_playwright__browser_close"
+    ]
+  }
+}

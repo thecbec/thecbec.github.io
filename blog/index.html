@@ -1,0 +1,14 @@
+---
+layout: default
+title: Blog
+permalink: /blog/
+---
+
+<section class="section-block">
+  <div class="section-title">Full Archive</div>
+  <div class="post-grid">
+    {% for post in site.posts %}
+      {% include post-card.html post=post class="post-card--grid" show_excerpt=false %}
+    {% endfor %}
+  </div>
+</section>

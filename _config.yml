@@ -1,0 +1,28 @@
+title: "CBEC for Development"
+description: "Farm Worker Spirit"
+url: "https://thecbec.github.io"
+baseurl: ""
+permalink: /:year/:month/:day/:title/
+markdown: kramdown
+
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+include:
+  - pages
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "page"
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+  - scope:
+      path: "pages"
+    values:
+      layout: "page"
