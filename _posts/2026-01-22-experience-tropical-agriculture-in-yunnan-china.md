@@ -1,7 +1,8 @@
 ---
 layout: "post"
 title: "Experience Tropical Agriculture in Yunnan, China (July 1-15, 2026)"
-date: "2026-01-22 00:00:00 +0000"
+date: "2026-01-14 00:00:00 +0000"
+permalink: "/2026/01/14/experience-tropical-agriculture-in-yunnan-china-july-1-15-2026/"
 featured_image: "/wp-content/uploads/2026/01/experience-yunnan-china.png"
 excerpt: "A two-week summer program in Yunnan featuring tea-forest ecology, cultural heritage tours, and immersive rural experiences for international students."
 categories:
