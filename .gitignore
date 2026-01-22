@@ -8,3 +8,5 @@ vendor/
 .playwright-mcp/
 README_LOCAL.md
 project_log.md
+copy_content.py
+copy_posts.py
