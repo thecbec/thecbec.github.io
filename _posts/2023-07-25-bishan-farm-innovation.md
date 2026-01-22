@@ -2,7 +2,7 @@
 
 layout: "post"
 title: "Innovative Digital Solutions for a Smart Farm in Rural China (Video)"
-date: "2023-07-25 17:36:41 +0000"
+date: "2023-07-25 00:00:00 +0000"
 featured_image: "/wp-content/uploads/2023/07/bishan-farm.jpg"
 permalink: "/2023/07/25/bishan-farm-innovation/"
 categories:
@@ -33,9 +33,64 @@ redirect_from:
 
 
 
-<figure class="wp-block-video wp-block-embed is-type-video is-provider-videopress"><div class="wp-block-embed__wrapper">
-https://videopress.com/v/QunWUNWg?resizeToParent=true&amp;cover=true&amp;autoPlay=true&amp;preloadContent=metadata&amp;useAverageColor=true
-</div><figcaption>Innovation for Rural Revitalization: Bishan Farm's Tech-Driven Proposal</figcaption></figure>
+<div class="video-embed">
+  <button class="video-embed__trigger" type="button" data-video-src="/wp-content/uploads/2023/07/bishan-farm-innovation-china.mp4" aria-label="Play Bishan Farm video">
+    <img src="/wp-content/uploads/2023/07/bishan-farm.jpg" alt="Bishan Farm innovation video cover" loading="lazy" />
+    <span class="video-embed__play" aria-hidden="true">▶</span>
+  </button>
+  <p class="video-embed__caption">Innovation for Rural Revitalization: Bishan Farm's Tech-Driven Proposal</p>
+</div>
+
+<div class="video-lightbox" aria-hidden="true">
+  <div class="video-lightbox__backdrop" data-video-close></div>
+  <figure class="video-lightbox__content" role="dialog" aria-modal="true" aria-label="Video preview">
+    <button class="video-lightbox__close" type="button" aria-label="Close video" data-video-close>×</button>
+    <video class="video-lightbox__media" controls playsinline preload="metadata"></video>
+  </figure>
+</div>
+
+<script>
+(function() {
+  var trigger = document.querySelector('.video-embed__trigger');
+  var lightbox = document.querySelector('.video-lightbox');
+  if (!trigger || !lightbox) return;
+
+  var video = lightbox.querySelector('.video-lightbox__media');
+  var closeButtons = lightbox.querySelectorAll('[data-video-close]');
+
+  function openVideo(src) {
+    if (!src) return;
+    video.src = src;
+    lightbox.classList.add('is-open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('lightbox-open');
+    video.play().catch(function() {});
+  }
+
+  function closeVideo() {
+    lightbox.classList.remove('is-open');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('lightbox-open');
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+  }
+
+  trigger.addEventListener('click', function() {
+    openVideo(trigger.getAttribute('data-video-src'));
+  });
+
+  closeButtons.forEach(function(button) {
+    button.addEventListener('click', closeVideo);
+  });
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && lightbox.classList.contains('is-open')) {
+      closeVideo();
+    }
+  });
+})();
+</script>
 
 
 
