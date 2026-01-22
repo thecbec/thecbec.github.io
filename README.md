@@ -66,6 +66,53 @@ Basic flow:
 
 GitHub Pages will build and publish the site automatically.
 
+## 3a) GitHub login/auth (switching accounts)
+
+If you use multiple GitHub accounts on this PC, Git may cache the "wrong" user.
+When that happens, clear the cached credentials and log in again.
+
+### Option A: Browser login (Git Credential Manager)
+
+This is the simplest login method.
+
+```powershell
+git config --global credential.helper manager-core
+git push
+```
+
+A browser window will open. Sign in as the correct account.
+
+### Option B: Personal Access Token (works even if GCM fails)
+
+Create a token:
+1. GitHub (web) -> Settings -> Developer settings
+2. Personal access tokens -> Tokens (classic)
+3. Generate new token (classic)
+4. Scopes: check `repo`
+5. Copy the token (you will see it only once)
+
+Use it when pushing:
+
+```powershell
+git -c credential.helper= push
+```
+
+When prompted:
+- Username: your GitHub username (e.g. `thecbec`)
+- Password: paste the token
+
+Note: the password prompt shows nothing as you type. Right-click to paste, then press Enter.
+
+### Clear cached GitHub credentials (if push uses the wrong account)
+
+```powershell
+cmdkey /list
+cmdkey /delete:git:https://github.com
+cmdkey /delete:github.com
+```
+
+Then push again using Option A or Option B.
+
 ## 4) If you want to rebuild manually
 
 This is optional. You usually do not need this because GitHub Pages builds the site for you. Use it only if you want to refresh the local `_site/` folder.
