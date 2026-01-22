@@ -4,6 +4,7 @@ layout: "post"
 title: "Innovative Digital Solutions for a Smart Farm in Rural China (Video)"
 date: "2023-07-25 17:36:41 +0000"
 featured_image: "/wp-content/uploads/2023/07/bishan-farm.jpg"
+permalink: "/2023/07/25/bishan-farm-innovation/"
 categories:
   - "Insights"
   - "Stories"
