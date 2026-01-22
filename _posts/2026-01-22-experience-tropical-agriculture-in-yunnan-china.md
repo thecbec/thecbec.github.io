@@ -3,6 +3,7 @@ layout: "post"
 title: "Experience Tropical Agriculture in Yunnan, China (July 1-15, 2026)"
 date: "2026-01-22 00:00:00 +0000"
 featured_image: "/wp-content/uploads/2026/01/experience-yunnan-china.png"
+excerpt: "A two-week summer program in Yunnan featuring tea-forest ecology, cultural heritage tours, and immersive rural experiences for international students."
 categories:
   - "Events"
   - "Stories"
@@ -40,21 +41,22 @@ tags:
 
 <h2 class="wp-block-heading">Financial Information</h2>
 
-<div class="wp-block-columns" style="margin-top:10px;margin-bottom:22px">
-  <div class="wp-block-column" style="border-width:1px;border-radius:10px;padding-top:14px;padding-right:16px;padding-bottom:14px;padding-left:16px">
+<div class="wp-block-group" style="border:1px solid #e6e6e6;border-radius:12px;margin-top:10px;margin-bottom:22px;overflow:hidden">
+  <div class="wp-block-columns" style="margin:0">
+    <div class="wp-block-column" style="padding-top:14px;padding-right:16px;padding-bottom:14px;padding-left:16px">
     <p><strong>Participants cover</strong></p>
     <ul class="wp-block-list">
       <li>International flights &amp; Visa fees</li>
     </ul>
-  </div>
-  <div class="wp-block-column" style="border-width:1px;border-radius:10px;padding-top:14px;padding-right:16px;padding-bottom:14px;padding-left:16px">
-    <hr class="wp-block-separator is-style-wide" />
+    </div>
+    <div class="wp-block-column" style="border-left:1px solid #e6e6e6;padding-top:14px;padding-right:16px;padding-bottom:14px;padding-left:16px">
     <p><strong>The program covers</strong></p>
     <ul class="wp-block-list">
       <li>Local transportation</li>
       <li>Insurance</li>
       <li>Hotel accommodation</li>
     </ul>
+    </div>
   </div>
 </div>
 
