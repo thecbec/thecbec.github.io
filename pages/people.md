@@ -44,7 +44,7 @@ body_class: "people-page"
 
 
 
-<p class="has-small-font-size" style="line-height:1.4">Amar, an Associate Professor at Huanggang Normal Univeristy, handles key research, publications, and forums. He oversees the the <em>Entrepreneurship for Sustainability</em> journal, forums, the website, and other academic initiatives. Since 2024, he is the Program Manager for You Microfinance Fund of the CBEC Group.</p>
+<p class="has-small-font-size" style="line-height:1.4">Amar, an Associate Professor at Huanggang Normal Univeristy, handles key research, publications, and forums. He oversees the the <em>Entrepreneurship for Sustainability</em> journal, forums, the website, and other academic initiatives. Since 2024, he is the Program Manager for You Microfinance Fund of the CBEC Group. <a href="https://amarrazzaq.com" target="_blank" rel="noopener noreferrer">amarrazzaq.com &rarr;</a></p>
 </div>
 </div>
 
