@@ -44,7 +44,7 @@ body_class: "people-page"
 
 
 
-<p class="has-small-font-size" style="line-height:1.4">Amar, an Associate Professor at Huanggang Normal Univeristy, handles key research, publications, and forums. He oversees the the <em>Entrepreneurship for Sustainability</em> journal, forums, the website, and other academic initiatives. Since 2024, he is the Program Manager for You Microfinance Fund of the CBEC Group. <a href="https://amarrazzaq.com" target="_blank" rel="noopener noreferrer" aria-label="Open amarrazzaq.com in a new tab">amarrazzaq.com <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" style="margin-left:4px;vertical-align:-2px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14 3h7v7"></path><path d="M10 14L21 3"></path><path d="M21 14v7h-7"></path><path d="M3 10V3h7"></path></svg></a></p>
+<p class="has-small-font-size" style="line-height:1.4">Amar, an Associate Professor at Huanggang Normal Univeristy, handles key research, publications, and forums. He oversees the the <em>Entrepreneurship for Sustainability</em> journal, forums, the website, and other academic initiatives. Since 2024, he is the Program Manager for You Microfinance Fund of the CBEC Group. <a href="https://amarrazzaq.com" target="_blank" rel="noopener noreferrer" aria-label="Open Amar's website in a new tab">Website <svg aria-hidden="true" viewBox="0 0 24 24" width="12" height="12" style="margin-left:6px;vertical-align:-1px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.85"><path d="M14 3h7v7"></path><path d="M10 14L21 3"></path><path d="M21 14v7h-7"></path><path d="M3 10V3h7"></path></svg></a></p>
 </div>
 </div>
 
